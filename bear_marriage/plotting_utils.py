@@ -1,6 +1,11 @@
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 
+import plotly.express as px
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+
 from .data import ColoredPoint
 
 
@@ -20,11 +25,12 @@ def plot_polygon(points: list[ColoredPoint]) -> Figure:
     return plt.gcf()
 
 
+def plot_pairs(pairs: list[tuple[ColoredPoint, ColoredPoint]]) -> go.Figure:
+    fig = make_subplots()
 
-def plot_pairs(pairs: list[tuple[ColoredPoint, ColoredPoint]]) -> Figure:
-    fig, ax = plt.subplots()
     for a_point, b_point in pairs:
         data = ([a_point.x, b_point.x], [a_point.y, b_point.y])
-        ax.plot(*data)
-        ax.scatter(*data, c=[a_point.black, b_point.black])
+        fig.add_trace(go.Scatter(x=data[0], y=data[1], mode='lines+markers',
+                                 marker=dict(color=[a_point.black, b_point.black])))
+
     return fig
