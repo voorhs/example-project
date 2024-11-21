@@ -5,3 +5,6 @@ ipywidgets
 streamlit
 pandas
 plotly
+fastapi
+uvicorn
+python-multipart

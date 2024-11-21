@@ -1,12 +1,11 @@
-from dataclasses import dataclass
-
 import numpy as np
 import numpy.typing as npt
+from pydantic import BaseModel
 
 from io import BytesIO
 
-@dataclass
-class ColoredPoint:
+
+class ColoredPoint(BaseModel):
     x: float
     y: float
     black: bool
@@ -35,5 +34,5 @@ def read_points(file: BytesIO) -> list[ColoredPoint]:
         if len(line.strip()) == 0:
             continue
         _, x, y, black = line.split()
-        res.append(ColoredPoint(float(x), float(y), black == "1"))
+        res.append(ColoredPoint(x=float(x), y=float(y), black=(black == "1")))
     return res
