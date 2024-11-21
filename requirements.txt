@@ -2,3 +2,6 @@ numpy
 matplotlib
 ipykernel
 ipywidgets
+streamlit
+pandas
+plotly
