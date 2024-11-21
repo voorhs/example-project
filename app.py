@@ -2,8 +2,9 @@ from io import BytesIO
 
 import streamlit as st
 
+from bear_marriage.plotting_utils import plot_pairs
 
-from bear_marriage.client import read_points, connect_points, plot_pairs
+from bear_marriage.client import read_points, connect_points
 
 with st.sidebar:
      st.header("Data Sidebar")
@@ -18,5 +19,4 @@ if file is not None:
      st.subheader("Vizualization")
      points = read_points(file)
      pairs = connect_points(points)
-     st.write(pairs)
-     # st.write(plot_pairs(pairs))
+     st.write(plot_pairs(pairs))

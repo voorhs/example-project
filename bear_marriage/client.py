@@ -28,6 +28,3 @@ def connect_points(
     response.raise_for_status()
     raw_data = response.json()
     return [(ColoredPoint(**record_1), ColoredPoint(**record_2)) for record_1, record_2 in raw_data]
-
-def plot_pairs(pairs: list[tuple[ColoredPoint, ColoredPoint]]) -> go.Figure:
-    ...
