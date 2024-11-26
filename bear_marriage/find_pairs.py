@@ -1,4 +1,6 @@
-from copy import deepcopy
+import math
+from copy import copy
+from typing import Literal
 
 import numpy as np
 
@@ -41,9 +43,19 @@ def find_closest_to_middle(lst: list[bool]) -> int | None:
 
 
 def connect_points(
+    points: list[ColoredPoint], method: Literal["line", "hull"]
+) -> list[tuple[ColoredPoint, ColoredPoint]]:
+    if method == "hull":
+        return connect_points_hull_approach(points)
+    if method == "line":
+        return connect_points_line_approach(points)
+    raise ValueError("unsupported method")
+
+
+def connect_points_hull_approach(
     points: list[ColoredPoint],
 ) -> list[tuple[ColoredPoint, ColoredPoint]]:
-    points = deepcopy(points)
+    points = copy(points)
     res = []  # list of tuples[point_id, point_id]
     n = len([p for p in points if p.black])
     assert n == len([p for p in points if not p.black])
@@ -73,8 +85,8 @@ def connect_points(
                 raise RuntimeError("something's wrong")
             left_set = [points[i] for i in left_to_right_ids[: border + 1]]
             right_set = [points[i] for i in left_to_right_ids[border + 1 :]]
-            res.extend(connect_points(left_set))
-            res.extend(connect_points(right_set))
+            res.extend(connect_points_hull_approach(left_set))
+            res.extend(connect_points_hull_approach(right_set))
             return res
         else:
             # both blacks and whites are present in the hull
@@ -92,3 +104,60 @@ def connect_points(
             # exclude connected points
             remove_elements_by_indexes(points, ids_to_remove)
     return res
+
+
+def angle(p: ColoredPoint, pivot: ColoredPoint):
+    dx, dy = p.x - pivot.x, p.y - pivot.y
+    return math.atan2(dy, dx)
+
+
+def split(
+    points: list[ColoredPoint],
+) -> tuple[tuple[ColoredPoint, ColoredPoint], list[ColoredPoint], list[ColoredPoint]]:
+    n = len([p for p in points if p.black])
+    assert n == len([p for p in points if not p.black])
+
+    leftmost_point_id = min(range(2 * n), key=lambda i: points[i])
+
+    sorted_points_ids = np.argsort(
+        [angle(p, points[leftmost_point_id]) for p in points]
+    )
+
+    b_count = points[leftmost_point_id].black
+    w_count = not points[leftmost_point_id].black
+    trace = []
+
+    for point_id in sorted_points_ids:
+        if point_id == leftmost_point_id:
+            trace.append(False)
+            continue
+        if points[point_id].black:
+            b_count += 1
+        else:
+            w_count += 1
+        flag = (b_count == w_count) and (
+            points[leftmost_point_id].black != points[point_id].black
+        )
+        trace.append(flag)
+
+    border = find_closest_to_middle(trace)
+    if border is None:
+        raise RuntimeError("something's wrong")
+
+    left_set = [points[i] for i in sorted_points_ids[:border] if i != leftmost_point_id]
+    right_set = [
+        points[i] for i in sorted_points_ids[border + 1 :] if i != leftmost_point_id
+    ]
+    pair = (points[leftmost_point_id], points[sorted_points_ids[border]])
+    return pair, left_set, right_set
+
+
+def connect_points_line_approach(
+    points: list[ColoredPoint],
+) -> list[tuple[ColoredPoint, ColoredPoint]]:
+    if len(points) == 0:
+        return []
+    pair, left, right = split(points)
+    left_pairs = connect_points_line_approach(left)
+    right_pairs = connect_points_line_approach(right)
+    return [pair] + left_pairs + right_pairs

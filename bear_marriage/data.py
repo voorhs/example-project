@@ -1,18 +1,21 @@
+from io import BytesIO
 from dataclasses import dataclass
 
 import numpy as np
 import numpy.typing as npt
 
-from io import BytesIO
 
 @dataclass
 class ColoredPoint:
     x: float
     y: float
-    black: bool
+    black: bool  # True means point is black, False means it's white
 
     def __lt__(self, other: "ColoredPoint") -> bool:
         return (self.x, self.y) < (other.x, other.y)
+
+    def __eq__(self, other: "ColoredPoint") -> bool:
+        return (self.x, self.y, self.black) == (other.x, other.y, other.black)
 
 
 def color_points(points: npt.NDArray[np.float32], black: bool):
