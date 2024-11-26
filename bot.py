@@ -7,8 +7,8 @@ from pathlib import Path
 
 from aiogram import Bot, Dispatcher
 from aiogram.filters import Command
-from aiogram.enums import ParseMode
-from aiogram.types import Message, ContentType, CallbackQuery, FSInputFile, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.types import Message, ContentType, CallbackQuery, FSInputFile, InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.utils.formatting import Bold, Code, as_list, as_key_value
 
 from bear_marriage.data import read_points
 from bear_marriage.find_pairs import connect_points
@@ -107,7 +107,15 @@ async def start_build(callback_query: CallbackQuery):
             await callback_query.message.answer_photo(photo)
             distances_path.unlink()
 
-            await callback_query.message.answer(f"Statistics: {statistics}")
+            formatted_statistics = as_list(
+                Bold("Path length statistics:"),
+                as_key_value("Mean",  Code(f"{statistics['mean']:.2f}")),
+                as_key_value("Standard Deviation",  Code(f"{statistics['std']:.2f}")),
+                as_key_value("Minimum",  Code(f"{statistics['min']:.2f}")),
+                as_key_value("Maximum",  Code(f"{statistics['max']:.2f}")),
+                as_key_value("Sum",  Code(f"{statistics['sum']:.2f}")),
+            )
+            await callback_query.message.answer(**formatted_statistics.as_kwargs())
     else:
         await callback_query.message.reply("Please upload a file and select a method first.")
     await callback_query.answer()
