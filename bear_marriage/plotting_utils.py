@@ -54,7 +54,7 @@ def plot_pairs_plotly(pairs: list[tuple[ColoredPoint, ColoredPoint]]) -> go.Figu
     return fig
 
 
-def plot_distances(pairs: list[tuple[ColoredPoint, ColoredPoint]]) -> go.Figure:
+def plot_distances(pairs: list[tuple[ColoredPoint, ColoredPoint]]) -> tuple[go.Figure, dict]:
     all_distances, statistics = get_distances(pairs)
 
     # Create a histogram using Plotly Express
