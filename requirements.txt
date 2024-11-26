@@ -5,3 +5,6 @@ ipywidgets
 streamlit
 pandas
 plotly
+aiogram
+python-dotenv
+kaleido
